@@ -3,40 +3,98 @@ title: "PCA"
 format: html
 editor: visual
 ---
+Primero, importamos y cargamos los datos:
 
 ```{r}
 library(tidyverse)
 data <- read.table("europa.dat", sep = "", header = TRUE)
+
 data %>% glimpse
 
-
 ```
+Ahora, como vamos a utilizar la matriz de varianzas/covarianzas para el análisis de componentes, vamos a visualizar esta matriz:
+
 ```{r}
 cov(data)
-cor(data)
 ```
-```{r}
-princomp(data, cor = FALSE, scores = TRUE)
-```
-```{r}
+Empezamos ahora con el PCA. Utilizamos la función `princomp()` con el parámetro "cor=FALSE". Como los datos estan tomados en las mismas unidades, no es necesario reescalarlas. El resultado que obtenemos es el siguiente:
+
+```{r, warning=FALSE}
 library(ggplot2)
 library("factoextra")
-data.acp=prcomp(data, scale = FALSE)
+data.acp=princomp(data, cor = FALSE)
 data.acp
 ```
+Para entenderlo mejor, obtenemos los valores propios de cada componente:
+
+```{r}
+get_eigenvalue(data.acp)
+```
+Observamos que, mirando la última columna de la tabla anterior, la primera componente principal explica el 81.57% de los datos, mientras que si consideramos dos componentes, explicaríamos un 93.3% de los datos. Cabe mencionar que si añadimos una componente más no nos proporciona información relevante en cuanto a representación de las variables.
+
+Esto lo visualizamos mejor en el siguiente gráfico:
+
 ```{r}
 fviz_eig(data.acp, addlabels = TRUE, ylim=c(0,100))
 ```
+Como vemos, hay una diferencia notable en las pendientes entre las componentes principales. En concreto, la pendiente entre la primera y la segundas componentes es mucho más pronunciada que entre el resto de pendientes, hecho que reafirma la conclusión anterior.
+
+En el siguiente gráfico vemos como quedarían representadas cada una de las variables en el círculo de correlación variable.
 
 ```{r}
 fviz_pca_var(data.acp, col.var = "contrib",
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
              repel = TRUE) 
 ```
+
+Vamos a explicarlo detalladamente:
+
+- La variable Agricultura esta aislada del resto, lo que nos lleva a concluir que no está correlacionada con ellas.
+- El color de cada variable indica cuan bien representadas están; vemos que la variable que mejor representada está es Agricultura, seguido de Fábrica y SSPP (Servicios Sociales y Personales). El color del resto de las variables nos indica que no quedan bien representadas con estas dos componentes.
+
+
 ```{r}
 fviz_pca_biplot(data.acp, repel = TRUE,
                 col.var = "#2E9FDF", # color para las variables
                 col.ind = "#696969"  # color para las observaciones
                 )
 ```
+
+
+```{r}
+data[which.max(data$Agr),]
+which.max(data$Agr)
+```
+
+```{r}
+datos_sin_turq=data[-18,]
+datos_sin_turq
+data.acp.turq=princomp(datos_sin_turq, cor = FALSE)
+data.acp.turq
+get_eigenvalue(data.acp.turq)
+```
+```{r}
+fviz_pca_var(data.acp.turq, col.var = "contrib",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE) 
+```
+
+
+
+```{r}
+fviz_pca_biplot(data.acp.turq, repel = TRUE,
+                col.var = "#2E9FDF", # color para las variables
+                col.ind = "#696969"  # color para las observaciones
+                )
+```
+
+
+
+```{r}
+# Resultados por Variables
+ res.var=get_pca_var(data.acp)
+ res.var$contrib        # Contribuciones a las CP
+```
+
+
 
