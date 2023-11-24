@@ -3,45 +3,68 @@ title: "PCA"
 format: html
 editor: visual
 ---
+
+## Enunciado
+
+Considera los datos `europa.dat` que están disponibles en Aula Digital. Los datos corresponden a los porcentajes de población empleados en diferentes actividades económicas en Europa para el año 1979. Las variables consideradas son: 
+- Agricultura
+- Minas
+- Fábricas 
+- Suministro Eléctrico
+- Construcción
+- Industrias de Servicio
+- Finanzas
+- Servicios Sociales y Personales 
+- Transporte y Comunicaciones. 
+
+Utiliza el método de componentes principales para reducir el número de variables, y tratar de determinar grupos de países con comportamientos semejantes en la distribución de su fuerza de trabajo. En este caso, usa la matriz de covarianza para el cálculo de las componentes principales, ya que todos los datos están medidos en la misma escala (porcentaje de la población) y por las caractersticas de los datos, no parece una buena idea considerarlos todos de igual manera.
+
+## Solución
+
 Primero, importamos y cargamos los datos:
 
-```{r}
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
 library(tidyverse)
 data <- read.table("europa.dat", sep = "", header = TRUE)
 
 data %>% glimpse
 
 ```
+
 Ahora, como vamos a utilizar la matriz de varianzas/covarianzas para el análisis de componentes, vamos a visualizar esta matriz:
 
-```{r}
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
 cov(data)
 ```
-Empezamos ahora con el PCA. Utilizamos la función `princomp()` con el parámetro "cor=FALSE". Como los datos estan tomados en las mismas unidades, no es necesario reescalarlas. El resultado que obtenemos es el siguiente:
 
-```{r, warning=FALSE}
+Empezamos ahora con el PCA. Utilizamos la función `princomp()` con el parámetro `cor` igualado a FALSE. Como los datos están tomados en las mismas unidades, no es necesario reescalarlas. El resultado que obtenemos es el siguiente:
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
 library(ggplot2)
 library("factoextra")
 data.acp=princomp(data, cor = FALSE)
 data.acp
 ```
+
 Para entenderlo mejor, obtenemos los valores propios de cada componente:
 
-```{r}
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
 get_eigenvalue(data.acp)
 ```
-Observamos que, mirando la última columna de la tabla anterior, la primera componente principal explica el 81.57% de los datos, mientras que si consideramos dos componentes, explicaríamos un 93.3% de los datos. Cabe mencionar que si añadimos una componente más no nos proporciona información relevante en cuanto a representación de las variables.
+
+Si nos fijamos en la última columna de la tabla anterior, la primera componente principal explica el 81.57% de los datos, mientras que si consideramos dos componentes, explicaríamos un 93.3% de los datos. Cabe mencionar que añadir una componente más no nos proporciona información relevante en cuanto a representación de las variables.
 
 Esto lo visualizamos mejor en el siguiente gráfico:
 
-```{r}
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
 fviz_eig(data.acp, addlabels = TRUE, ylim=c(0,100))
 ```
-Como vemos, hay una diferencia notable en las pendientes entre las componentes principales. En concreto, la pendiente entre la primera y la segundas componentes es mucho más pronunciada que entre el resto de pendientes, hecho que reafirma la conclusión anterior.
+
+Como vemos, hay una diferencia notable en las pendientes entre las componentes principales. En concreto, la pendiente entre la primera y la segunda componentes es mucho más pronunciada que entre el resto de pendientes, hecho que reafirma la conclusión anterior.
 
 En el siguiente gráfico vemos como quedarían representadas cada una de las variables en el círculo de correlación variable.
 
-```{r}
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
 fviz_pca_var(data.acp, col.var = "contrib",
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
              repel = TRUE) 
@@ -49,52 +72,89 @@ fviz_pca_var(data.acp, col.var = "contrib",
 
 Vamos a explicarlo detalladamente:
 
-- La variable Agricultura esta aislada del resto, lo que nos lleva a concluir que no está correlacionada con ellas.
-- El color de cada variable indica cuan bien representadas están; vemos que la variable que mejor representada está es Agricultura, seguido de Fábrica y SSPP (Servicios Sociales y Personales). El color del resto de las variables nos indica que no quedan bien representadas con estas dos componentes.
+-   La variable "Agricultura" esta aislada del resto, lo que nos lleva a concluir que no está correlacionada con ellas.
 
+-   El color de cada variable indica cuan bien representadas están; vemos que la variable que mejor representada está es "Agricultura", seguido de "Fábrica" y "SSPP" (Servicios Sociales y Personales). El color del resto de las variables nos indica que no quedan bien representadas con estas dos componentes.
 
-```{r}
+- La longitud de las flechas nos indica que no todas las varibales tienen influencia en las componentes princpales. En efecto, "Min", "Con", "TC", "Ene" y "Fin" son variables con poca representación. Por el contrario, "Agricultura" tiene una fuerte influencia (es la flecha más larga).
+
+Con la información obtenida, veamos si podemos obtener una clasificación de los países por grupos a través de las dos componentes principales.
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
 fviz_pca_biplot(data.acp, repel = TRUE,
-                col.var = "#2E9FDF", # color para las variables
+                col.var = "blue", # color para las variables
                 col.ind = "#696969"  # color para las observaciones
                 )
 ```
 
+Como vemos, no hay una separación clara de los países en función de las componentes principales. Para poder analizar más en concreto este punto, consideraremos el siguiente gráfico:
 
-```{r}
-data[which.max(data$Agr),]
-which.max(data$Agr)
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+fviz_pca_biplot(data.acp, repel = TRUE,
+                invisible = "var", # color para las variables
+                col.ind = "cos2"  # color para las observaciones
+                )
+```
+En él, podemos ver los países coloreados en relación a la calidad de representación en el ACP. Los países representados por azul claro tienen una alta representación, mientras que los países con un azul más oscuro no, como es el caso de la Unión Soviética.
+
+Vemos que por ejemplo Portugal y Yugoslavia quedan muy bien explicadas por la CP1; está, daba mucho peso a la variable "Agricultura". Si accedemos a registros históricos, Yugoslavia era un país agrícola; la mayoría de sus habitantes poseían terrenos para el cultivo y vivían de ellos.
+
+- portugal
+- españa
+- turquia 
+- checoslovaquia
+
+Numéricamente, la calidad de representación de las dos CP es la siguiente:
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+#res.var$cos2[,1:2]          # Calidad de la representación
+res.obs=get_pca_ind(data.acp)
+head(res.obs$coord,25)[,1:2]
 ```
 
-```{r}
-datos_sin_turq=data[-18,]
-datos_sin_turq
-data.acp.turq=princomp(datos_sin_turq, cor = FALSE)
-data.acp.turq
-get_eigenvalue(data.acp.turq)
+Vamos a realizar el mismo estudio, pero sin considerar los países que son outliers. Para ello, primero vamos a visualizar quiénes son estos países. Utilizamos la función `boxplot()`:
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+
+boxplot(data)
+
 ```
+Como vemos, tenemos 8 países que son outliers. Estos son:
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+
+```
+
+Entonces, consideramos el nuevo tibble sin los outliers anteriores:
+
 ```{r}
-fviz_pca_var(data.acp.turq, col.var = "contrib",
-             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
-             repel = TRUE) 
+#datos_sin_outliers=data[,]
+
+```
+
+Realizamos el ACP:
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+#data.acp.outliers=princomp(datos_sin_outliers, cor = FALSE)
+#data.acp.outliers
+
 ```
 
 
+fviz_pca_var(data.acp.turq, repel = TRUE,
+              col.var = "contrib",
+              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07")) 
 
-```{r}
+
 fviz_pca_biplot(data.acp.turq, repel = TRUE,
-                col.var = "#2E9FDF", # color para las variables
-                col.ind = "#696969"  # color para las observaciones
+                col.var = "#2E9FDF",  color para las variables
+                col.ind = "#696969"   color para las observaciones
                 )
-```
-
 
 
 ```{r}
 # Resultados por Variables
- res.var=get_pca_var(data.acp)
- res.var$contrib        # Contribuciones a las CP
+ #res.var=get_pca_var(data.acp)
+ #res.var$contrib        Contribuciones a las CP
 ```
-
-
-

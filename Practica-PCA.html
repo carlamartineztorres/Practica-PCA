@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.353">
+<meta name="generator" content="quarto-1.3.433">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -94,24 +94,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
+<section id="enunciado" class="level2">
+<h2 class="anchored" data-anchor-id="enunciado">Enunciado</h2>
+<p>Considera los datos <code>europa.dat</code> que están disponibles en Aula Digital. Los datos corresponden a los porcentajes de población empleados en diferentes actividades económicas en Europa para el año 1979. Las variables consideradas son: - Agricultura - Minas - Fábricas - Suministro Eléctrico - Construcción - Industrias de Servicio - Finanzas - Servicios Sociales y Personales - Transporte y Comunicaciones.</p>
+<p>Utiliza el método de componentes principales para reducir el número de variables, y tratar de determinar grupos de países con comportamientos semejantes en la distribución de su fuerza de trabajo. En este caso, usa la matriz de covarianza para el cálculo de las componentes principales, ya que todos los datos están medidos en la misma escala (porcentaje de la población) y por las caractersticas de los datos, no parece una buena idea considerarlos todos de igual manera.</p>
+</section>
+<section id="solución" class="level2">
+<h2 class="anchored" data-anchor-id="solución">Solución</h2>
 <p>Primero, importamos y cargamos los datos:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-✔ dplyr     1.1.3     ✔ readr     2.1.4
-✔ forcats   1.0.0     ✔ stringr   1.5.0
-✔ ggplot2   3.4.3     ✔ tibble    3.2.1
-✔ lubridate 1.9.2     ✔ tidyr     1.3.0
-✔ purrr     1.0.2     
-── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-✖ dplyr::filter() masks stats::filter()
-✖ dplyr::lag()    masks stats::lag()
-ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">"europa.dat"</span>, <span class="at">sep =</span> <span class="st">""</span>, <span class="at">header =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>data <span class="sc">%&gt;%</span> glimpse</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 26
 Columns: 9
@@ -128,7 +119,6 @@ $ TC  &lt;dbl&gt; 7.2, 7.1, 5.7, 6.1, 6.1, 5.7, 6.2, 6.8, 6.4, 7.0, 7.6, 6.7, 9.
 </div>
 <p>Ahora, como vamos a utilizar la matriz de varianzas/covarianzas para el análisis de componentes, vamos a visualizar esta matriz:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cov</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>            Agr         Min        Fab         Ene          Con          IS
 Agr 241.6958154  0.53987692 -73.113846 -2.33984615 -13.77209231 -52.4210462
@@ -152,15 +142,8 @@ SSP  2.0632  46.6426462   5.3964923
 TC  -0.9604   5.3964923   1.9361846</code></pre>
 </div>
 </div>
-<p>Empezamos ahora con el PCA. Utilizamos la función <code>princomp()</code> con el parámetro “cor=FALSE”. Como los datos estan tomados en las mismas unidades, no es necesario reescalarlas. El resultado que obtenemos es el siguiente:</p>
+<p>Empezamos ahora con el PCA. Utilizamos la función <code>princomp()</code> con el parámetro <code>cor</code> igualado a FALSE. Como los datos están tomados en las mismas unidades, no es necesario reescalarlas. El resultado que obtenemos es el siguiente:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"factoextra"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Welcome! Want to learn more? See two factoextra-related books at https://goo.gl/ve3WBa</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>data.acp<span class="ot">=</span><span class="fu">princomp</span>(data, <span class="at">cor =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>data.acp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Call:
 princomp(x = data, cor = FALSE)
@@ -176,7 +159,6 @@ Standard deviations:
 </div>
 <p>Para entenderlo mejor, obtenemos los valores propios de cada componente:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_eigenvalue</span>(data.acp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>        eigenvalue variance.percent cumulative.variance.percent
 Dim.1 2.917866e+02     81.578357771                    81.57836
@@ -190,152 +172,97 @@ Dim.8 6.242948e-02      0.017454172                    99.99949
 Dim.9 1.838443e-03      0.000513996                   100.00000</code></pre>
 </div>
 </div>
-<p>Observamos que, mirando la última columna de la tabla anterior, la primera componente principal explica el 81.57% de los datos, mientras que si consideramos dos componentes, explicaríamos un 93.3% de los datos. Cabe mencionar que si añadimos una componente más no nos proporciona información relevante en cuanto a representación de las variables.</p>
+<p>Si nos fijamos en la última columna de la tabla anterior, la primera componente principal explica el 81.57% de los datos, mientras que si consideramos dos componentes, explicaríamos un 93.3% de los datos. Cabe mencionar que añadir una componente más no nos proporciona información relevante en cuanto a representación de las variables.</p>
 <p>Esto lo visualizamos mejor en el siguiente gráfico:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_eig</span>(data.acp, <span class="at">addlabels =</span> <span class="cn">TRUE</span>, <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">100</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Practica-PCA_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Como vemos, hay una diferencia notable en las pendientes entre las componentes principales. En concreto, la pendiente entre la primera y la segundas componentes es mucho más pronunciada que entre el resto de pendientes, hecho que reafirma la conclusión anterior.</p>
+<p>Como vemos, hay una diferencia notable en las pendientes entre las componentes principales. En concreto, la pendiente entre la primera y la segunda componentes es mucho más pronunciada que entre el resto de pendientes, hecho que reafirma la conclusión anterior.</p>
 <p>En el siguiente gráfico vemos como quedarían representadas cada una de las variables en el círculo de correlación variable.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_pca_var</span>(data.acp, <span class="at">col.var =</span> <span class="st">"contrib"</span>,</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">gradient.cols =</span> <span class="fu">c</span>(<span class="st">"#00AFBB"</span>, <span class="st">"#E7B800"</span>, <span class="st">"#FC4E07"</span>),</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">repel =</span> <span class="cn">TRUE</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Practica-PCA_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Vamos a explicarlo detalladamente:</p>
 <ul>
-<li>La variable Agricultura esta aislada del resto, lo que nos lleva a concluir que no está correlacionada con ellas.</li>
-<li>El color de cada variable indica cuan bien representadas están; vemos que la variable que mejor representada está es Agricultura, seguido de Fábrica y SSPP (Servicios Sociales y Personales). El color del resto de las variables nos indica que no quedan bien representadas con estas dos componentes.</li>
+<li><p>La variable “Agricultura” esta aislada del resto, lo que nos lleva a concluir que no está correlacionada con ellas.</p></li>
+<li><p>El color de cada variable indica cuan bien representadas están; vemos que la variable que mejor representada está es “Agricultura”, seguido de “Fábrica” y “SSPP” (Servicios Sociales y Personales). El color del resto de las variables nos indica que no quedan bien representadas con estas dos componentes.</p></li>
+<li><p>La longitud de las flechas nos indica que no todas las varibales tienen influencia en las componentes princpales. En efecto, “Min”, “Con”, “TC”, “Ene” y “Fin” son variables con poca representación. Por el contrario, “Agricultura” tiene una fuerte influencia (es la flecha más larga).</p></li>
 </ul>
+<p>Con la información obtenida, veamos si podemos obtener una clasificación de los países por grupos a través de las dos componentes principales.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_pca_biplot</span>(data.acp, <span class="at">repel =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">col.var =</span> <span class="st">"#2E9FDF"</span>, <span class="co"># color para las variables</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">col.ind =</span> <span class="st">"#696969"</span>  <span class="co"># color para las observaciones</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Practica-PCA_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>Como vemos, no hay una separación clara de los países en función de las componentes principales. Para poder analizar más en concreto este punto, consideraremos el siguiente gráfico:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>data[<span class="fu">which.max</span>(data<span class="sc">$</span>Agr),]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>         Agr Min Fab Ene Con  IS Fin  SSP  TC
-Turquia 66.8 0.7 7.9 0.1 2.8 5.2 1.1 11.9 3.2</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">which.max</span>(data<span class="sc">$</span>Agr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 18</code></pre>
+<div class="cell-output-display">
+<p><img src="Practica-PCA_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>En él, podemos ver los países coloreados en relación a la calidad de representación en el ACP. Los países representados por azul claro tienen una alta representación, mientras que los países con un azul más oscuro no, como es el caso de la Unión Soviética.</p>
+<p>Vemos que por ejemplo Portugal y Yugoslavia quedan muy bien explicadas por la CP1; está, daba mucho peso a la variable “Agricultura”. Si accedemos a registros históricos, Yugoslavia era un país agrícola; la mayoría de sus habitantes poseían terrenos para el cultivo y vivían de ellos.</p>
+<ul>
+<li>portugal</li>
+<li>españa</li>
+<li>turquia</li>
+<li>checoslovaquia</li>
+</ul>
+<p>Numéricamente, la calidad de representación de las dos CP es la siguiente:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>datos_sin_turq<span class="ot">=</span>data[<span class="sc">-</span><span class="dv">18</span>,]</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>datos_sin_turq</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                     Agr Min  Fab Ene  Con   IS  Fin  SSP  TC
-Belgica              3.3 0.9 27.6 0.9  8.2 19.1  6.2 26.6 7.2
-Dinamarca            9.2 0.1 21.8 0.6  8.3 14.6  6.5 32.2 7.1
-Francia             10.8 0.8 27.5 0.9  8.9 16.8  6.0 22.6 5.7
-Alemania Occidental  6.7 1.3 35.8 0.9  7.3 14.4  5.0 22.3 6.1
-Irlanda             23.2 1.0 20.7 1.3  7.5 16.8  2.8 20.8 6.1
-Italia              15.9 0.6 27.6 0.5 10.0 18.1  1.6 20.1 5.7
-Luxemburgo           7.7 3.1 30.8 0.8  9.2 18.5  4.6 19.2 6.2
-Holanda              6.3 0.1 22.5 1.0  9.9 18.0  6.8 28.5 6.8
-Inglaterra           2.7 1.4 30.2 1.4  6.9 16.9  5.7 28.3 6.4
-Austria             12.7 1.1 30.2 1.4  9.0 16.8  4.9 16.8 7.0
-Finlandia           13.0 0.4 25.9 1.3  7.4 14.7  5.5 24.3 7.6
-Grecia              41.4 0.6 17.6 0.6  8.1 11.5  2.4 11.0 6.7
-Noruega              9.0 0.5 22.4 0.8  8.6 16.9  4.7 27.6 9.4
-Portugal            27.8 0.3 24.5 0.6  8.4 13.3  2.7 16.7 5.7
-Espana              22.9 0.8 28.5 0.7 11.5  9.7  8.5 11.8 5.5
-Suecia               6.1 0.4 25.9 0.8  7.2 14.4  6.0 32.4 6.8
-Suiza                7.7 0.2 37.8 0.8  9.5 17.5  5.3 15.4 5.7
-Bulgaria            23.6 1.9 32.3 0.6  7.9  8.0  0.7 18.2 6.7
-Checoslovaquia      16.5 2.9 35.5 1.2  8.7  9.2  0.9 17.9 7.0
-Alemania Oriental    4.2 2.9 41.2 1.3  7.6 11.2  1.2 22.1 8.4
-Hungria             21.7 3.1 29.6 1.9  8.2  9.4  0.9 17.2 8.0
-Polonia             31.1 2.5 25.7 0.9  8.4  7.5  0.9 16.1 6.9
-Rumania             34.7 2.1 30.1 0.6  8.7  5.9  1.3 11.7 5.0
-Union Sovietica     23.7 1.4 25.8 0.6  9.2  6.1  0.5 23.6 9.3
-Yugoslavia          48.7 1.5 16.8 1.1  4.9  6.4 11.3  5.3 4.0</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>data.acp.turq<span class="ot">=</span><span class="fu">princomp</span>(datos_sin_turq, <span class="at">cor =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>data.acp.turq</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Call:
-princomp(x = datos_sin_turq, cor = FALSE)
-
-Standard deviations:
-     Comp.1      Comp.2      Comp.3      Comp.4      Comp.5      Comp.6 
-13.90355801  6.21019952  3.81385136  2.33046122  1.26794348  1.00943770 
-     Comp.7      Comp.8      Comp.9 
- 0.64833418  0.25141360  0.03838949 
-
- 9  variables and  25 observations.</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_eigenvalue</span>(data.acp.turq)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>        eigenvalue variance.percent cumulative.variance.percent
-Dim.1 1.933089e+02     7.581822e+01                    75.81822
-Dim.2 3.856658e+01     1.512630e+01                    90.94452
-Dim.3 1.454546e+01     5.704915e+00                    96.64944
-Dim.4 5.431050e+00     2.130127e+00                    98.77957
-Dim.5 1.607681e+00     6.305528e-01                    99.41012
-Dim.6 1.018964e+00     3.996508e-01                    99.80977
-Dim.7 4.203372e-01     1.648616e-01                    99.97463
-Dim.8 6.320880e-02     2.479130e-02                    99.99942
-Dim.9 1.473753e-03     5.780246e-04                   100.00000</code></pre>
+<pre><code>                         Dim.1        Dim.2
+Belgica             -17.516687   4.92622849
+Dinamarca           -11.496688  11.66176637
+Francia              -9.128686   2.16828207
+Alemania Occidental -14.393424  -5.04749385
+Irlanda               4.458174   6.13156498
+Italia               -4.026684   0.38889529
+Luxemburgo          -12.089752  -2.33236877
+Holanda             -13.900455   9.72359023
+Inglaterra          -18.728675   3.33178946
+Austria              -6.471418  -3.35662962
+Finlandia            -6.837047   3.97634061
+Grecia               25.427083   1.80467718
+Noruega             -10.972019   8.85877780
+Portugal              9.403865   0.08570061
+Espana                5.774973  -6.15867547
+Suecia              -15.311975   8.52674423
+Suiza               -12.683839  -9.77920054
+Turquia              52.115644   8.64165980
+Bulgaria              4.156791  -6.70685051
+Checoslovaquia       -3.246127  -9.23467980
+Alemania Oriental   -17.415527 -10.73233092
+Hungria               3.135737  -4.98695108
+Polonia              13.315709  -2.94482700
+Rumania              17.011336  -9.12523022
+Union Sovietica       4.587043   0.87197041</code></pre>
 </div>
 </div>
+<p>Vamos a realizar el mismo estudio, pero sin considerar los países que son outliers. Para ello, primero vamos a visualizar quiénes son estos países. Utilizamos la función <code>boxplot()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_pca_var</span>(data.acp.turq, <span class="at">col.var =</span> <span class="st">"contrib"</span>,</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">gradient.cols =</span> <span class="fu">c</span>(<span class="st">"#00AFBB"</span>, <span class="st">"#E7B800"</span>, <span class="st">"#FC4E07"</span>),</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">repel =</span> <span class="cn">TRUE</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Practica-PCA_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>Como vemos, tenemos 8 países que son outliers. Estos son:</p>
+<p>Entonces, consideramos el nuevo tibble sin los outliers anteriores:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_pca_biplot</span>(data.acp.turq, <span class="at">repel =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">col.var =</span> <span class="st">"#2E9FDF"</span>, <span class="co"># color para las variables</span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">col.ind =</span> <span class="st">"#696969"</span>  <span class="co"># color para las observaciones</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="Practica-PCA_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#datos_sin_outliers=data[,]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
+<p>Realizamos el ACP:</p>
+<p>fviz_pca_var(data.acp.turq, repel = TRUE, col.var = “contrib”, gradient.cols = c(“#00AFBB”, “#E7B800”, “#FC4E07”))</p>
+<p>fviz_pca_biplot(data.acp.turq, repel = TRUE, col.var = “#2E9FDF”, color para las variables col.ind = “#696969” color para las observaciones )</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Resultados por Variables</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a> res.var<span class="ot">=</span><span class="fu">get_pca_var</span>(data.acp)</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a> res.var<span class="sc">$</span>contrib        <span class="co"># Contribuciones a las CP</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>           Dim.1        Dim.2        Dim.3       Dim.4        Dim.5       Dim.6
-Agr 7.952331e+01  0.004660446  1.403435889  0.93638759 3.241576e+00  2.32945775
-Min 3.696458e-04  0.852798119  0.630103643  0.01031511 1.258084e-04 20.82655520
-Fab 7.358818e+00 59.331467329  3.410632975  0.01081761 1.128958e+01  4.03732430
-Ene 7.036333e-03  0.014438239  0.004581018  0.03291243 6.050071e-04  5.32982493
-Con 2.459566e-01  0.475942289  0.597726373  0.68767455 5.245560e+01 31.17630538
-IS  3.678663e+00  5.495110161 33.595094217 36.91881834 7.068314e+00  0.04653693
-Fin 9.689906e-02  1.692143168 22.087174349 61.02627458 1.465602e+00  0.30560660
-SSP 8.883160e+00 32.123662232 35.729930152  0.23364906 5.565634e+00  6.14350149
-TC  2.057918e-01  0.009778018  2.541321383  0.14315074 1.891296e+01 29.80488742
-           Dim.7        Dim.8    Dim.9
-Agr  0.839448109  0.471667676 11.25006
-Min 58.747681926  8.436949495 10.49510
-Fab  2.623864396  0.549343859 11.38815
-Ene  0.396103481 82.661418853 11.55308
-Con  3.775037619  0.001987319 10.58377
-IS   0.773263826  1.090680669 11.33352
-Fin  0.639625083  1.506871025 11.17980
-SSP  0.002064549  0.271829809 11.04657
-TC  32.202911012  5.009251295 11.16995</code></pre>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Resultados por Variables</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a> <span class="co">#res.var=get_pca_var(data.acp)</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a> <span class="co">#res.var$contrib        Contribuciones a las CP</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
+</section>
 
 </main>
 <!-- /main column -->
